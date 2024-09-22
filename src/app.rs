@@ -213,19 +213,72 @@ impl cosmic::Application for Minimon {
                 elements.push(mem_widget);
             }
 
-            if self.config.enable_net {
-                let svg = self.netmon.svg();
-                let handle = cosmic::widget::icon::from_svg_bytes(svg.into_bytes());
 
-                let net_widget = Element::from(
-                    self.core
-                        .applet
-                        .icon_button_from_handle(handle)
-                        .on_press(Message::TogglePopup)
-                        .style(cosmic::theme::Button::AppletIcon),
+            if self.config.enable_net {
+                let mut formated_down = String::new();
+
+                if !formated_down.is_empty() {
+                    formated_down.push(' ');
+                }
+                formated_down.push_str(&format!("↓ {}", self.netmon.dl_to_string()));
+
+                let mut formated_up = String::new();
+
+                if !formated_up.is_empty() {
+                    formated_up.push(' ');
+                }
+                formated_up.push_str(&format!("↑ {}", self.netmon.ul_to_string()));
+
+                let net_widget_down = Element::from(
+                    cosmic::widget::button(
+                        row!(
+                            self.core.applet.text(formated_down),
+                            container(vertical_space(Length::Fixed(f32::from(
+                                self.core.applet.suggested_size(true).1
+                                    + 2 * self.core.applet.suggested_padding(true)
+                            ))))
+                        )
+                        .align_items(Alignment::Center),
+                    )
+                    .padding([0, self.core.applet.suggested_padding(true)])
+                    .on_press(Message::TogglePopup)
+                    .style(cosmic::theme::Button::AppletIcon)
                 );
-                elements.push(net_widget);
+
+                let net_widget_up = Element::from(
+                    cosmic::widget::button(
+                        row!(
+                            self.core.applet.text(formated_up),
+                            container(vertical_space(Length::Fixed(f32::from(
+                                self.core.applet.suggested_size(true).1
+                                    + 2 * self.core.applet.suggested_padding(true)
+                            ))))
+                        )
+                        .align_items(Alignment::Center),
+                    )
+                    .padding([0, self.core.applet.suggested_padding(true)])
+                    .on_press(Message::TogglePopup)
+                    .style(cosmic::theme::Button::AppletIcon)
+                );
+
+                elements.push(net_widget_down);
+                elements.push(net_widget_up);
+
             }
+
+            // if self.config.enable_net {
+            //     let svg = self.netmon.svg();
+            //     let handle = cosmic::widget::icon::from_svg_bytes(svg.into_bytes());
+
+            //     let net_widget = Element::from(
+            //         self.core
+            //             .applet
+            //             .icon_button_from_handle(handle)
+            //             .on_press(Message::TogglePopup)
+            //             .style(cosmic::theme::Button::AppletIcon),
+            //     );
+            //     elements.push(net_widget);
+            // }
 
             if horizontal {
                 let row = Row::with_children(elements)
