@@ -1,6 +1,6 @@
 text-only = Show text only
 enable-cpu = Show CPU load average
-enable-net = Show network load in bits
+enable-net = Show network load in bytes
 enable-memory = Show memory in use
 use-adaptive = Use adaptive scale
 net-bandwidth = Network speed

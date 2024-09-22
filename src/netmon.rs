@@ -93,8 +93,8 @@ impl NetMon {
         let mut ul = 0;
 
         for (_, network) in &self.networks {
-            dl += network.received() * 8;
-            ul += network.transmitted() * 8;
+            dl += network.received();
+            ul += network.transmitted();
         }
 
         if self.download.len() >= MAX_SAMPLES {
@@ -128,8 +128,8 @@ impl NetMon {
         }
     }
 
-    // Get bits per second
-    pub fn get_bitrate_dl(&self, ticks_per_sec: usize) -> String {
+    // Get Bytes per second
+    pub fn get_byterate_dl(&self, ticks_per_sec: usize) -> String {
         let len = self.download.len();
         let start = if ticks_per_sec > len { 0 } else { len - ticks_per_sec };
         // Sum the last `ticks` elements
@@ -137,8 +137,8 @@ impl NetMon {
         NetMon::makestr(bps, UnitVariant::Long)
     }
 
-    // Get bits per second
-    pub fn get_bitrate_ul(&self, ticks_per_sec: usize) -> String {
+    // Get Bytes per second
+    pub fn get_byterate_ul(&self, ticks_per_sec: usize) -> String {
         let len = self.upload.len();
         let start = if ticks_per_sec > len { 0 } else { len - ticks_per_sec };
         // Sum the last `ticks` elements
@@ -146,24 +146,25 @@ impl NetMon {
         NetMon::makestr(bps, UnitVariant::Long)
     }
 
-    // Bits per tick
-    pub fn dl_to_string(&self) -> String {
+    // Bytes per second
+    pub fn dl_to_string(&self, refresh_rate: f64) -> String {
+
         let dl = if !self.download.is_empty() {
-            *self.download.back().unwrap_or(&0u64)
+            *self.download.back().unwrap_or(&0u64) as f64 / refresh_rate
         } else {
-            0
+            0.0
         };
-        NetMon::makestr(dl, UnitVariant::Short)
+        NetMon::makestr(dl as u64, UnitVariant::Short)
     }
 
-    // Bits per tick
-    pub fn ul_to_string(&self) -> String {
+    // Bytes per second
+    pub fn ul_to_string(&self, refresh_rate: f64) -> String {
         let ul = if !self.upload.is_empty() {
-            *self.upload.back().unwrap_or(&0u64)
+            *self.upload.back().unwrap_or(&0u64) as f64 / refresh_rate
         } else {
-            0
+            0.0
         };
-        NetMon::makestr(ul, UnitVariant::Short)
+        NetMon::makestr(ul as u64, UnitVariant::Short)
     }
 
     fn svg_compose(

@@ -172,6 +172,8 @@ impl cosmic::Application for Minimon {
     }
 
     fn view(&self) -> Element<Message> {
+        let refresh_rate: f64 = self.config.refresh_rate as f64 / 1000.0;
+
         let horizontal = matches!(
             self.core.applet.anchor,
             PanelAnchor::Top | PanelAnchor::Bottom
@@ -220,14 +222,15 @@ impl cosmic::Application for Minimon {
                 if !formated_down.is_empty() {
                     formated_down.push(' ');
                 }
-                formated_down.push_str(&format!("↓ {}", self.netmon.dl_to_string()));
+                formated_down.push_str(&format!("↓ {}", self.netmon.dl_to_string(refresh_rate)));
 
                 let mut formated_up = String::new();
 
                 if !formated_up.is_empty() {
                     formated_up.push(' ');
                 }
-                formated_up.push_str(&format!("↑ {}", self.netmon.ul_to_string()));
+
+                formated_up.push_str(&format!("↑ {}", self.netmon.ul_to_string(refresh_rate)));
 
                 let net_widget_down = Element::from(
                     cosmic::widget::button(
@@ -313,9 +316,9 @@ impl cosmic::Application for Minimon {
                 if !formated.is_empty() {
                     formated.push(' ');
                 }
-                formated.push_str(&self.netmon.dl_to_string());
+                formated.push_str(&self.netmon.dl_to_string(refresh_rate));
                 formated.push(' ');
-                formated.push_str(&self.netmon.ul_to_string());
+                formated.push_str(&self.netmon.ul_to_string(refresh_rate));
             }
 
             Element::from(
@@ -349,8 +352,8 @@ impl cosmic::Application for Minimon {
             }
 
             if self.config.enable_net {
-                elements.push(self.core.applet.text(self.netmon.dl_to_string()).into());
-                elements.push(self.core.applet.text(self.netmon.ul_to_string()).into());
+                elements.push(self.core.applet.text(self.netmon.dl_to_string(refresh_rate)).into());
+                elements.push(self.core.applet.text(self.netmon.ul_to_string(refresh_rate)).into());
             }
 
             let col = Column::with_children(elements)
@@ -491,8 +494,8 @@ impl cosmic::Application for Minimon {
             let mut net_elements = Vec::new();
 
             let ticks_per_sec = (1000 / self.tick.clone().load(atomic::Ordering::Relaxed)) as usize;
-            let dlrate = self.netmon.get_bitrate_dl(ticks_per_sec);
-            let ulrate = self.netmon.get_bitrate_ul(ticks_per_sec);
+            let dlrate = self.netmon.get_byterate_dl(ticks_per_sec);
+            let ulrate = self.netmon.get_byterate_ul(ticks_per_sec);
 
             net_elements.push(Element::from(
                 column!(
