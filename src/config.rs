@@ -158,7 +158,7 @@ impl Default for MinimonConfig {
             enable_net: true,
             refresh_rate: 1000,
             enable_adaptive_net: true,
-            net_bandwidth: 62_500_000, // 500Mbit/s
+            net_bandwidth: 15_728_640, // 15 MiB/s
             net_unit: Some(0),
             cpu_colors: SvgColors::new(SvgDevKind::Cpu(SvgGraphKind::Ring)),
             mem_colors: SvgColors::new(SvgDevKind::Memory(SvgGraphKind::Line)),

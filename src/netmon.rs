@@ -10,8 +10,8 @@ use crate::{
 
 const MAX_SAMPLES: usize = 30;
 const GRAPH_SAMPLES: usize = 21;
-const UNITS_SHORT: [&str; 5] = ["b", "K", "M", "G", "T"];
-const UNITS_LONG: [&str; 5] = ["bps", "Kbps", "Mbps", "Gbps", "Tbps"];
+const UNITS_SHORT: [&str; 5] = ["B", "K", "M", "G", "T"];
+const UNITS_LONG: [&str; 5] = ["B/s", "KiB/s", "MiB/s", "GiB/s", "TiB/s"];
 
 const COLOR_CHOICES: [(&str, SvgColorVariant); 4] = [
     ("Down.  ", SvgColorVariant::Color2),

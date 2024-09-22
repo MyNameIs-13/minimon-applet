@@ -117,7 +117,7 @@ impl cosmic::Application for Minimon {
             svgstat_mem: super::svgstat::SvgStat::new(SvgDevKind::Memory(SvgGraphKind::Line)),
             popup: None,
             colorpicker: ColorPicker::new(),
-            dropdown_options: ["b", "Kb", "Mb", "Gb", "Tb"].into(),
+            dropdown_options: ["B", "KiB", "MiB", "GiB", "TiB"].into(),
             graph_options: ["Ring", "Line"].into(),
             netmon: NetMon::new(),
             config: MinimonConfig::default(),
@@ -895,7 +895,7 @@ impl Minimon {
             } else {
                 1
             };
-            let multiplier: [u64; 5] = [1, 1000, 1_000_000, 1_000_000_000, 1_000_000_000_000];
+            let multiplier: [u64; 5] = [1, 1024, 1_048_576, 1_073_741_824, 1_099_511_627_776];
             self.netmon
                 .set_max_y(Some(self.config.net_bandwidth * multiplier[unit]));
         }
