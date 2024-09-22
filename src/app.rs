@@ -198,16 +198,20 @@ impl cosmic::Application for Minimon {
             if self.config.enable_cpu {
                 let cpu_widget = if horizontal {
                     Element::from(
-                        row!(
-                            self.core.applet.text("Cpu: "),
-                            self.core
-                                .applet
-                                .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_cpu))
-                                .on_press(Message::TogglePopup)
-                                .style(cosmic::theme::Button::AppletIcon),
-                            self.core.applet.text(format!(" {}",&self.cpu_temp)),
+                        cosmic::widget::button(
+                            row!(
+                                self.core.applet.text("Cpu: "),
+                                self.core
+                                    .applet
+                                    .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_cpu)),
+                                    // .on_press(Message::TogglePopup)
+                                    // .style(cosmic::theme::Button::AppletIcon),
+                                self.core.applet.text(format!(" {}",&self.cpu_temp)),
+                            )
+                            .align_items(Alignment::Center)
                         )
-                        .align_items(Alignment::Center),
+                        .on_press(Message::TogglePopup)
+                        .style(cosmic::theme::Button::AppletIcon),
                     )
                 } else {
                     Element::from(
@@ -224,15 +228,19 @@ impl cosmic::Application for Minimon {
             if self.config.enable_mem {
                 let mem_widget = if horizontal {
                     Element::from(
-                        row!(
-                            self.core.applet.text("Mem: "),
-                            self.core
-                                .applet
-                                .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_mem))
-                                .on_press(Message::TogglePopup)
-                                .style(cosmic::theme::Button::AppletIcon),
+                        cosmic::widget::button(
+                            row!(
+                                self.core.applet.text("Mem: "),
+                                self.core
+                                    .applet
+                                    .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_mem)),
+                                    // .on_press(Message::TogglePopup)
+                                    // .style(cosmic::theme::Button::AppletIcon),
+                            )
+                            .align_items(Alignment::Center)
                         )
-                        .align_items(Alignment::Center),
+                        .on_press(Message::TogglePopup)
+                        .style(cosmic::theme::Button::AppletIcon),
                     )
                 } else {
                     Element::from(
@@ -245,8 +253,6 @@ impl cosmic::Application for Minimon {
                 };
                 elements.push(mem_widget);
             }
-
-
 
             if self.config.enable_net {
                 let mut formated_down = String::new();
@@ -264,40 +270,63 @@ impl cosmic::Application for Minimon {
 
                 formated_up.push_str(&format!("↑ {}", self.netmon.ul_to_string(refresh_rate)));
 
-                let net_widget_down = Element::from(
-                    cosmic::widget::button(
-                        row!(
-                            self.core.applet.text(formated_down),
-                            // container(vertical_space(Length::Fixed(f32::from(
-                            //     self.core.applet.suggested_size(true).1
-                            //         + 2 * self.core.applet.suggested_padding(true)
-                            // ))))
+                if horizontal {
+                    let net_widget = Element::from(
+                        cosmic::widget::button(
+                            row!(
+                                self.core.applet.text(formated_down),
+                                self.core.applet.text(" "),
+                                self.core.applet.text(formated_up),
+                                // container(vertical_space(Length::Fixed(f32::from(
+                                //     self.core.applet.suggested_size(true).1
+                                //         + 2 * self.core.applet.suggested_padding(true)
+                                // ))))
+                            )
+                            .align_items(Alignment::Center),
                         )
-                        .align_items(Alignment::Center),
-                    )
-                    // .padding([0, self.core.applet.suggested_padding(true)])
-                    .on_press(Message::TogglePopup)
-                    .style(cosmic::theme::Button::AppletIcon)
-                );
+                        // .padding([0, self.core.applet.suggested_padding(true)])
+                        .on_press(Message::TogglePopup)
+                        .style(cosmic::theme::Button::AppletIcon)
+                    );
 
-                let net_widget_up = Element::from(
-                    cosmic::widget::button(
-                        row!(
-                            self.core.applet.text(formated_up),
-                            // container(vertical_space(Length::Fixed(f32::from(
-                            //     self.core.applet.suggested_size(true).1
-                            //         + 2 * self.core.applet.suggested_padding(true)
-                            // ))))
+                    elements.push(net_widget);
+
+                } else {
+                    let net_widget_down = Element::from(
+                        cosmic::widget::button(
+                            row!(
+                                self.core.applet.text(formated_down),
+                                // container(vertical_space(Length::Fixed(f32::from(
+                                //     self.core.applet.suggested_size(true).1
+                                //         + 2 * self.core.applet.suggested_padding(true)
+                                // ))))
+                            )
+                            .align_items(Alignment::Center),
                         )
-                        .align_items(Alignment::Center),
-                    )
-                    // .padding([0, self.core.applet.suggested_padding(true)])
-                    .on_press(Message::TogglePopup)
-                    .style(cosmic::theme::Button::AppletIcon)
-                );
+                        // .padding([0, self.core.applet.suggested_padding(true)])
+                        .on_press(Message::TogglePopup)
+                        .style(cosmic::theme::Button::AppletIcon)
+                    );
 
-                elements.push(net_widget_down);
-                elements.push(net_widget_up);
+                    let net_widget_up = Element::from(
+                        cosmic::widget::button(
+                            row!(
+                                self.core.applet.text(formated_up),
+                                // container(vertical_space(Length::Fixed(f32::from(
+                                //     self.core.applet.suggested_size(true).1
+                                //         + 2 * self.core.applet.suggested_padding(true)
+                                // ))))
+                            )
+                            .align_items(Alignment::Center),
+                        )
+                        // .padding([0, self.core.applet.suggested_padding(true)])
+                        .on_press(Message::TogglePopup)
+                        .style(cosmic::theme::Button::AppletIcon)
+                    );
+
+                    elements.push(net_widget_down);
+                    elements.push(net_widget_up);
+                }
 
             }
 
