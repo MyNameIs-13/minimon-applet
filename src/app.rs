@@ -40,6 +40,8 @@ pub struct Minimon {
     core: Core,
     /// The svg image to draw for the CPU load
     svgstat_cpu: super::svgstat::SvgStat,
+    /// The cpu temp
+    cpu_temp: String,
     /// The svg image to draw for the Memory load
     svgstat_mem: super::svgstat::SvgStat,
     /// The popup id.
@@ -114,6 +116,7 @@ impl cosmic::Application for Minimon {
         let app = Minimon {
             core,
             svgstat_cpu: super::svgstat::SvgStat::new(SvgDevKind::Cpu(SvgGraphKind::Ring)),
+            cpu_temp: String::from(""),
             svgstat_mem: super::svgstat::SvgStat::new(SvgDevKind::Memory(SvgGraphKind::Line)),
             popup: None,
             colorpicker: ColorPicker::new(),
@@ -196,12 +199,13 @@ impl cosmic::Application for Minimon {
                 let cpu_widget = if horizontal {
                     Element::from(
                         row!(
-                            self.core.applet.text("CPU: "),
+                            self.core.applet.text("Cpu: "),
                             self.core
                                 .applet
                                 .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_cpu))
                                 .on_press(Message::TogglePopup)
                                 .style(cosmic::theme::Button::AppletIcon),
+                            self.core.applet.text(format!(" {}",&self.cpu_temp)),
                         )
                         .align_items(Alignment::Center),
                     )
@@ -271,7 +275,7 @@ impl cosmic::Application for Minimon {
                         )
                         .align_items(Alignment::Center),
                     )
-                    .padding([0, self.core.applet.suggested_padding(true)])
+                    // .padding([0, self.core.applet.suggested_padding(true)])
                     .on_press(Message::TogglePopup)
                     .style(cosmic::theme::Button::AppletIcon)
                 );
@@ -287,7 +291,7 @@ impl cosmic::Application for Minimon {
                         )
                         .align_items(Alignment::Center),
                     )
-                    .padding([0, self.core.applet.suggested_padding(true)])
+                    // .padding([0, self.core.applet.suggested_padding(true)])
                     .on_press(Message::TogglePopup)
                     .style(cosmic::theme::Button::AppletIcon)
                 );
@@ -314,7 +318,7 @@ impl cosmic::Application for Minimon {
             if horizontal {
                 let row = Row::with_children(elements)
                     .align_items(Alignment::Center)
-                    .spacing(5);
+                    .spacing(15);
 
                 return Element::from(row!(row));
             }
@@ -850,6 +854,48 @@ impl cosmic::Application for Minimon {
     }
 }
 
+// Define a trait that adds the update method to String
+trait Update {
+    fn update(&mut self);
+}
+
+// Implement the trait for String
+impl Update for String {
+    fn update(&mut self) {
+        let k10temp = std::process::Command::new("bash")
+            .arg("-c")
+            .arg("sensors -j | jq '.[\"k10temp-pci-00c3\"].[\"Tctl\"][\"temp1_input\"]'")
+            .output()
+            .expect("Failed to execute command");
+
+        let k10temp_str = String::from_utf8_lossy(&k10temp.stdout);
+
+        let coretemp = std::process::Command::new("bash")
+            .arg("-c")
+            .arg("sensors -j | jq '.[\"coretemp-isa-0000\"].[\"Package id 0\"][\"temp1_input\"]'")
+            .output()
+            .expect("Failed to execute command");
+
+        let coretemp_str = String::from_utf8_lossy(&coretemp.stdout);
+
+        let mut temp = String::from("");
+        if k10temp_str.trim() != "null" {
+            // Parse and format without decimal places
+            if let Ok(value) = k10temp_str.trim().parse::<f32>() {
+                temp = format!("{:.0}", value);
+            }
+        } else if coretemp_str.trim() != "null" {
+            // Parse and format without decimal places
+            if let Ok(value) = coretemp_str.trim().parse::<f32>() {
+                temp = format!("{:.0}", value);
+            }
+        }
+
+        *self = format!("{}°C", temp);
+    }
+}
+
+
 impl Minimon {
     fn make_icon_handle(svgstat: &SvgStat) -> cosmic::widget::icon::Handle {
         cosmic::widget::icon::from_svg_bytes(svgstat.svg().into_bytes())
@@ -929,10 +975,12 @@ impl Minimon {
         }
     }
 
+    /// Retrieve the amount of data transmitted since last update.
     fn refresh_stats(&mut self) {
         self.svgstat_cpu.update();
         self.svgstat_mem.update();
         self.netmon.update();
+        self.cpu_temp.update();
     }
 
     fn spawn_sysmon(&self) {
