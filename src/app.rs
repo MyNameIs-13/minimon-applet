@@ -193,27 +193,55 @@ impl cosmic::Application for Minimon {
             let mut elements = Vec::new();
 
             if self.config.enable_cpu {
-                let cpu_widget = Element::from(
-                    self.core
-                        .applet
-                        .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_cpu))
-                        .on_press(Message::TogglePopup)
-                        .style(cosmic::theme::Button::AppletIcon),
-                );
+                let cpu_widget = if horizontal {
+                    Element::from(
+                        row!(
+                            self.core.applet.text("CPU: "),
+                            self.core
+                                .applet
+                                .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_cpu))
+                                .on_press(Message::TogglePopup)
+                                .style(cosmic::theme::Button::AppletIcon),
+                        )
+                        .align_items(Alignment::Center),
+                    )
+                } else {
+                    Element::from(
+                        self.core
+                            .applet
+                            .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_cpu))
+                            .on_press(Message::TogglePopup)
+                            .style(cosmic::theme::Button::AppletIcon),
+                    )
+                };
                 elements.push(cpu_widget);
             }
 
             if self.config.enable_mem {
-                let mem_widget = Element::from(
-                    self.core
-                        .applet
-                        .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_mem))
-                        .on_press(Message::TogglePopup)
-                        .style(cosmic::theme::Button::AppletIcon),
-                );
-
+                let mem_widget = if horizontal {
+                    Element::from(
+                        row!(
+                            self.core.applet.text("Mem: "),
+                            self.core
+                                .applet
+                                .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_mem))
+                                .on_press(Message::TogglePopup)
+                                .style(cosmic::theme::Button::AppletIcon),
+                        )
+                        .align_items(Alignment::Center),
+                    )
+                } else {
+                    Element::from(
+                        self.core
+                            .applet
+                            .icon_button_from_handle(Minimon::make_icon_handle(&self.svgstat_mem))
+                            .on_press(Message::TogglePopup)
+                            .style(cosmic::theme::Button::AppletIcon),
+                    )
+                };
                 elements.push(mem_widget);
             }
+
 
 
             if self.config.enable_net {
