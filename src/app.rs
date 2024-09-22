@@ -236,10 +236,10 @@ impl cosmic::Application for Minimon {
                     cosmic::widget::button(
                         row!(
                             self.core.applet.text(formated_down),
-                            container(vertical_space(Length::Fixed(f32::from(
-                                self.core.applet.suggested_size(true).1
-                                    + 2 * self.core.applet.suggested_padding(true)
-                            ))))
+                            // container(vertical_space(Length::Fixed(f32::from(
+                            //     self.core.applet.suggested_size(true).1
+                            //         + 2 * self.core.applet.suggested_padding(true)
+                            // ))))
                         )
                         .align_items(Alignment::Center),
                     )
@@ -252,10 +252,10 @@ impl cosmic::Application for Minimon {
                     cosmic::widget::button(
                         row!(
                             self.core.applet.text(formated_up),
-                            container(vertical_space(Length::Fixed(f32::from(
-                                self.core.applet.suggested_size(true).1
-                                    + 2 * self.core.applet.suggested_padding(true)
-                            ))))
+                            // container(vertical_space(Length::Fixed(f32::from(
+                            //     self.core.applet.suggested_size(true).1
+                            //         + 2 * self.core.applet.suggested_padding(true)
+                            // ))))
                         )
                         .align_items(Alignment::Center),
                     )
@@ -286,7 +286,7 @@ impl cosmic::Application for Minimon {
             if horizontal {
                 let row = Row::with_children(elements)
                     .align_items(Alignment::Center)
-                    .spacing(0);
+                    .spacing(5);
 
                 return Element::from(row!(row));
             }
